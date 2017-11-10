@@ -1,6 +1,6 @@
-(function( $ ){
+(function ($) {
 
-    $.fn.myPlugin = function(option) {
+    $.fn.myPlugin = function (option) {
         var settings = {
             'Paris': {name: 'Paris', code: 'fr'},
             'Amsterdam': {name: 'Amsterdam', code: 'nl'},
@@ -19,25 +19,44 @@
             $.extend(settings, option);
         }
 
-        var getForecastForProperCity = function() {
-            $.each(settings, function () {
-                if ($('li').text().indexOf(settings) !== -1) {
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('GET', 'http://api.openweathermap.org/data/2.5/weather?q=' + this.name + this.code + '&APPID=68e023fec6a329065a271ef2867ec8a3');
-                    xhr.onload = function () {
-                        if (xhr.status === 200) {
-                            var data = JSON.parse(xhr.responseText);
-                            var temperature = parseInt(data.main.temp - 273.15) + '&#176;C';
-                            $('li').append('Wow! Here is ' + temperature + 'by the way!');
-                            xhr.send();
-                        }
+        var listElement = $('li');
 
+        function getForecastForProperCity() {
+            $.each(this.find('li'), function () {
+                var listItem = $(this);
+                $.each(settings, function () {
+                    if (listItem.text().indexOf(this.name) !== -1) {
+                        $.ajax({
+                            method: 'get',
+                            url: 'http://api.openweathermap.org/data/2.5/weather?q=' + this.name + ',' + this.code + '&APPID=68e023fec6a329065a271ef2867ec8a3',
+                            success: function (results) {
+                                var temperature = parseInt(results.main.temp - 273.15) + '&#176;C';
+                                listItem.append('Wow! Here is ' + temperature + ' by the way!');
+                            }
+                        });
                     }
-                }
+                })
             })
-        };
+        }
 
-        return this.find('li').each($(this), getForecastForProperCity);
+        listElement.css('background-color', 'white')
+            .mouseenter(function () {
+                $(this).css("background-color", 'lightseagreen');
+            })
+            .mouseleave(function () {
+                $(this).css('background-color', 'white')
+            });
+
+        listElement.click(function () {
+            $(this).fadeOut('slow', function () {
+                $(this).insertBefore($('ul').find('li:first-child'))
+            })
+                .fadeIn('slow');
+        });
+
+        return this.each(getForecastForProperCity.bind(this));
     };
 
 })(jQuery);
+
+$('ul').myPlugin();
