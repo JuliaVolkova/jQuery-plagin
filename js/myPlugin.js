@@ -28,7 +28,7 @@
                     if (listItem.text().indexOf(this.name) !== -1) {
                         $.ajax({
                             method: 'get',
-                            url: 'http://api.openweathermap.org/data/2.5/weather?q=' + this.name + ',' + this.code + '&APPID=68e023fec6a329065a271ef2867ec8a3',
+                            url: 'https://api.openweathermap.org/data/2.5/weather?q=' + this.name + ',' + this.code + '&APPID=68e023fec6a329065a271ef2867ec8a3',
                             success: function (results) {
                                 var temperature = parseInt(results.main.temp - 273.15) + '&#176;C';
                                 listItem.append('Wow! Here is ' + temperature + ' by the way!');
