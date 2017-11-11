@@ -1,7 +1,7 @@
 (function ($) {
 
-    $.fn.myPlugin = function (option) {
-        var settings = {
+    $.fn.myPlugin = function (options) {
+        var cities = {
             'Paris': {name: 'Paris', code: 'fr'},
             'Amsterdam': {name: 'Amsterdam', code: 'nl'},
             'Auckland': {name: 'Auckland', code: 'nz'},
@@ -15,8 +15,16 @@
             'Tokyo': {name: 'Tokyo', code: 'jp'}
         };
 
-        if (option) {
-            $.extend(settings, option);
+        var direction = {
+            up: function(element) { return element.insertBefore($('ul').find('li:first-child')) },
+            down: function(element) { return element.insertAfter($('ul').find('li:last-child')) }
+        };
+
+        var move = direction.up;
+
+        if (options) {
+            $.extend(cities, options.auxiliaryCities);
+            move = direction[options.direction] || move;
         }
 
         var listElement = $('li');
@@ -24,11 +32,11 @@
         function getForecastForProperCity() {
             $.each(this.find('li'), function () {
                 var listItem = $(this);
-                $.each(settings, function () {
+                $.each(cities, function () {
                     if (listItem.text().indexOf(this.name) !== -1) {
                         $.ajax({
                             method: 'get',
-                            url: 'https://api.openweathermap.org/data/2.5/weather?q=' + this.name + ',' + this.code + '&APPID=68e023fec6a329065a271ef2867ec8a3',
+                            url: 'https://api.openweathermap.org/data/2.5/weather?q=' + this.name + ',' + this.code + '&APPID=1ce776c63fa744abd79089ebdecbf860',
                             success: function (results) {
                                 var temperature = parseInt(results.main.temp - 273.15) + '&#176;C';
                                 listItem.append('Wow! Here is ' + temperature + ' by the way!');
@@ -49,7 +57,7 @@
 
         listElement.click(function () {
             $(this).fadeOut('slow', function () {
-                $(this).insertBefore($('ul').find('li:first-child'))
+                move($(this));
             })
                 .fadeIn('slow');
         });
@@ -59,4 +67,7 @@
 
 })(jQuery);
 
-$('ul').myPlugin();
+$('ul').myPlugin({
+    auxiliaryCities: {},
+    direction: 'right'
+});
